@@ -1,0 +1,11 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="authenticatorAppName">@string/app_name</item>
+        <item name="authenticatorAppIcon">@mipmap/ic_launcher</item>
+        <item name="authenticatorAppSmallIcon">@mipmap/ic_launcher</item>
+    </style>
+
+</resources>

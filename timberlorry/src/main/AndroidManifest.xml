@@ -1,0 +1,38 @@
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.drivemode.timberlorry">
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <application>
+        <service
+            android:name="com.drivemode.timberlorry.internal.authenticator.StubAuthenticatorService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
+        <service
+            android:name="com.drivemode.timberlorry.collector.CollectorService"
+            android:exported="true"
+            android:process=":sync">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/timberlorry_sync_adapter" />
+        </service>
+        <provider
+            android:name="com.drivemode.timberlorry.buffer.BufferProvider"
+            android:authorities="com.drivemode.timberlorry.buffer.BufferProvider"
+            android:exported="false"
+            android:syncable="true"/>
+    </application>
+</manifest>

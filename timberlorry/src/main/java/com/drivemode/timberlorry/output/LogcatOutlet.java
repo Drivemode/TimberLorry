@@ -14,7 +14,7 @@ public class LogcatOutlet implements Outlet {
      */
     @Override
     public boolean accept(Class<?> payload) {
-        return true; // every payload is logged with this plug
+        return true; // every payload is logged with this outlet
     }
 
     /**

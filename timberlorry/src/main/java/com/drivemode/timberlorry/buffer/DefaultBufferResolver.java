@@ -7,7 +7,6 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.drivemode.timberlorry.internal.utils.Utils;
@@ -22,15 +21,9 @@ import java.util.List;
  * Buffer with content provider.
  * @author KeithYokoma
  */
-public class DefaultBufferResolver implements BufferResolver {
-    private final AccountManager accountManager;
-    private final ContentResolver resolver;
-    private final Account account;
-
+public class DefaultBufferResolver extends AbstractBufferResolver {
     public DefaultBufferResolver(@NonNull AccountManager accountManager, @NonNull ContentResolver resolver, Account account) {
-        this.accountManager = accountManager;
-        this.resolver = resolver;
-        this.account = account;
+        super(accountManager, resolver, account);
     }
 
     @Override
@@ -48,22 +41,6 @@ public class DefaultBufferResolver implements BufferResolver {
         }
         ContentValues[] array = values.toArray(new ContentValues[values.size()]);
         resolver.bulkInsert(BufferProvider.CONTENT_URI, array);
-    }
-
-    @Override
-    public void sync() {
-        // TODO: consider the condition that master sync is disabled.
-        ContentResolver.requestSync(account, BufferProvider.AUTHORITY, Bundle.EMPTY);
-    }
-
-    @Override
-    public void scheduleSync(long period) {
-        // TODO: consider the condition that master sync is disabled.
-        if (!Utils.isAccountAdded(accountManager, account.type)) {
-            accountManager.addAccountExplicitly(account, null, null);
-        }
-        ContentResolver.setSyncAutomatically(account, BufferProvider.AUTHORITY, true);
-        ContentResolver.addPeriodicSync(account, BufferProvider.AUTHORITY, Bundle.EMPTY, period);
     }
 
     @Override

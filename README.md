@@ -5,6 +5,156 @@ Periodical log collector framework.
 ![Timber Lorry](https://farm4.staticflickr.com/3746/11950116365_df10a41139_z_d.jpg)  
 Photo Licensed under [CC BY-NC 2.0](https://creativecommons.org/licenses/by-nc/2.0/) by jbdodane
 
+## Usage
+
+In your `Application`, initialize `TimberLorry` with configuration on your preference.
+After this, you can schedule periodical log collection.
+
+```java
+public class TimberLorryApplication extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        TimberLorry.initialize(new Config.Builder()
+                .collectIn(10) // collect log data every 10 seconds.
+                .serializeWith(new GsonSerializer())
+                .addOutlet(new LogcatOutlet()).build(this));
+        TimberLorry.getInstance().schedule();
+    }
+}
+```
+
+## How TimberLorry works
+
+TimberLorry is a log collector without data loss for some reasons(e.g. reboot, exit application).
+TimberLorry will store logs in the buffer(internal database by default), and periodically send it to an endpoint.
+If no internet connection available, the periodical work will not executed.
+
+## Building Blocks
+
+TimberLorry has some gateways to customize payloads, serialization logic, and buffer storage, and log endpoint.
+All customization will be injected with `Config` object.
+
+### Custom Payload
+
+Payload is an entity object containing log data.
+The following snippet shows an example code.
+
+```java
+public class ButtonClick implements Payload {
+    private final long timeInMillis;
+
+    public ButtonClick(long timeInMillis) {
+        this.timeInMillis = timeInMillis;
+    }
+}
+```
+
+Payloads will be serialized by `Serializer` in the buffer.
+
+### Custom Serializer
+
+You can add your own serializer.
+
+Here is an example using Gson.
+
+```java
+public class GsonSerializer implements Serializer {
+    @Override
+    public String serialize(Payload payload) {
+        return new Gson().toJson(payload);
+    }
+}
+```
+
+We have this `GsonSerializer` in `plug` project.
+
+### Custom BufferResolver
+
+If you would like to use another log data storage(e.g. internal storage, shared preferences), you can
+implement your own `BufferResolver`.
+
+```java
+public class SharedPrefBufferResolver extends AbstractBufferResolver {
+    private final Application application;
+
+    public SharedPrefBufferResolver(Application application, @NonNull AccountManager accountManager, @NonNull ContentResolver resolver, Account account) {
+        super(accountManager, resolver, account);
+        this.application = application;
+    }
+
+    @Override
+    public void save(Serializer serializer, Payload payload) {
+        Record record = new Record(payload.getClass(), serializer.serialize(payload));
+        // ... write record on the preference.
+    }
+
+    @Override
+    public void save(Serializer serializer, Payload... payloads) {
+        for (Payload payload : payloads) {
+            Record record = new Record(payload.getClass(), serializer.serialize(payload));
+            SharedPreferences pref = SharedPreferences.getDefaultSharedPreferences(application);
+            // ... write record on the preference.
+        }
+    }
+
+    @Override
+    public List<Record> fetch() {
+        List<Record> records = new ArrayList<>();
+        SharedPreferences pref = SharedPreferences.getDefaultSharedPreferences(application);
+        // ... find records on the preference and convert them to Record.
+        return records;
+    }
+
+    @Override
+    public void remove(Record record) {
+        SharedPreferences pref = SharedPreferences.getDefaultSharedPreferences(application);
+        // ... find record on the preference and remove it.
+    }
+
+    @Override
+    public void clear() {
+        SharedPreferences pref = SharedPreferences.getDefaultSharedPreferences(application);
+        pref.edit().clear().apply();
+    }
+}
+```
+
+### Custom Log Endpoint
+
+You can add log endpoint with custom `Outlet`.
+If you want to filter `Payload` in your `Outlet`, check the `Payload` class information in `Outlet#accept(Class<?>)` and return `true` if you accept the `Payload` in this `Outlet`.
+
+```java
+public class LogcatOutlet implements Outlet {
+    public static final String TAG = LogcatOutlet.class.getSimpleName();
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean accept(Class<?> payload) {
+        return true; // every payload is logged with this outlet
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Result dispatch(String payload) {
+        // do thread blocking work here :)
+        // if something went wrong here, catch the exception here and envelope it into Result object to return.
+        Utils.logV(payload);
+        return Result.success();
+    }
+
+    @Override
+    public String name() {
+        return "LogCat";
+    }
+}
+```
+
 ## License
 
 ```

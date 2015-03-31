@@ -26,6 +26,11 @@ public class Record {
         this.body = cursor.getString(cursor.getColumnIndex(BufferScheme.COLUMN_BODY));
     }
 
+    @Override
+    public String toString() {
+        return "Log record[" + String.valueOf(id) + "] described by " + clazz.getCanonicalName() + " [" + body + "]";
+    }
+
     public long getId() {
         return id;
     }

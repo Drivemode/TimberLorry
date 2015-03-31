@@ -37,7 +37,7 @@ public interface BufferResolver {
      * Deploy sync with the specified period.
      * @param period the sync period.
      */
-    void sync(long period);
+    void scheduleSync(long period);
 
     /**
      * Read all record from the buffer.

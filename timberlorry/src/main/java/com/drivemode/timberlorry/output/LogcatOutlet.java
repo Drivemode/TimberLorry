@@ -21,8 +21,13 @@ public class LogcatOutlet implements Outlet {
      * {@inheritDoc}
      */
     @Override
-    public Result publish(String payload) {
+    public Result dispatch(String payload) {
         Utils.logV(payload);
         return Result.success();
+    }
+
+    @Override
+    public String name() {
+        return "LogCat";
     }
 }

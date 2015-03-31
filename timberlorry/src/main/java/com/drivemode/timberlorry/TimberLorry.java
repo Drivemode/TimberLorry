@@ -3,6 +3,7 @@ package com.drivemode.timberlorry;
 import android.util.Log;
 
 import com.drivemode.timberlorry.buffer.BufferResolver;
+import com.drivemode.timberlorry.internal.utils.Utils;
 import com.drivemode.timberlorry.output.Outlet;
 import com.drivemode.timberlorry.output.Result;
 import com.drivemode.timberlorry.payload.Payload;
@@ -94,12 +95,12 @@ public abstract class TimberLorry {
     /**
      * Start collecting periodically.
      */
-    public abstract void drive();
+    public abstract void schedule();
 
     /**
      * Start collecting now.
      */
-    public abstract void driveNow();
+    public abstract void dispatch();
 
     /**
      * Clear all payload in the buffer.
@@ -141,9 +142,14 @@ public abstract class TimberLorry {
                     if (!plug.accept(record.getClazz())) {
                         continue;
                     }
-                    Result result = plug.publish(record.getBody());
+                    Result result = plug.dispatch(record.getBody());
                     if (result.isSuccess()) {
                         bufferResolver.remove(record);
+                    } else {
+                        Utils.logE("Cannot dispatch your log[" +
+                                record.getClazz().getCanonicalName() +
+                                "] to " + plug.name() +
+                                " for the reason: ", result.getException());
                     }
                 }
             }
@@ -153,15 +159,15 @@ public abstract class TimberLorry {
          * {@inheritDoc}
          */
         @Override
-        public void drive() {
-            bufferResolver.sync(period);
+        public void schedule() {
+            bufferResolver.scheduleSync(period);
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void driveNow() {
+        public void dispatch() {
             bufferResolver.sync();
         }
 

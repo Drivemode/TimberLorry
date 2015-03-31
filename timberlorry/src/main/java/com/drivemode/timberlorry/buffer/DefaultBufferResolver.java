@@ -57,7 +57,7 @@ public class DefaultBufferResolver implements BufferResolver {
     }
 
     @Override
-    public void sync(long period) {
+    public void scheduleSync(long period) {
         // TODO: consider the condition that master sync is disabled.
         if (!Utils.isAccountAdded(accountManager, account.type)) {
             accountManager.addAccountExplicitly(account, null, null);

@@ -14,8 +14,11 @@ public interface Outlet {
 
     /**
      * Send the payload in the current thread.
+     * If an error occurred while dispatching, you should catch it and put it in the result.
      * @param payload to be sent.
-     * @return {@link Result#success()} if the payload is sent successfully, {@link Result#failure()} if something went wrong on sending the payload.
+     * @return {@link Result#success()} if the payload is sent successfully, {@link Result#failure(Exception)} if something went wrong on sending the payload.
      */
-    Result publish(String payload);
+    Result dispatch(String payload);
+
+    String name();
 }

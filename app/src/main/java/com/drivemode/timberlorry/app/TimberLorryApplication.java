@@ -18,6 +18,6 @@ public class TimberLorryApplication extends Application {
                 .collectIn(10)
                 .serializeWith(new GsonSerializer())
                 .addOutlet(new LogcatOutlet()).build(this));
-        TimberLorry.getInstance().drive();
+        TimberLorry.getInstance().schedule();
     }
 }

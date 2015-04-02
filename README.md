@@ -160,6 +160,14 @@ public class LogcatOutlet implements Outlet {
 }
 ```
 
+## Plugins
+
+We have some customizations in "plug" project as plugin by default.
+Currently in "plug" project, following plugins are provided.
+
+- [Gson](https://code.google.com/p/google-gson/) serialization
+- [Realm](https://github.com/realm/realm-java) as a log storage.
+
 ## Download
 
 Via Gradle

@@ -155,6 +155,17 @@ public class LogcatOutlet implements Outlet {
 }
 ```
 
+## Download
+
+Via Gradle
+
+```groovy
+dependencies {
+    compile 'com.drivemode:TimberLorry:1.0.0@aar'
+    compile 'com.drivemode:TimberLorry-Plug:1.0.0@aar' // this is an optional
+}
+```
+
 ## License
 
 ```

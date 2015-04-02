@@ -1,5 +1,7 @@
 # TimberLorry
 
+[![Join the chat at https://gitter.im/Drivemode/TimberLorry](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Drivemode/TimberLorry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Gitter](http://img.shields.io/badge/Gitter-Join%20Chat-brightgreen.svg?style=flat)](https://gitter.im/Drivemode/TimberLorry?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![License](http://img.shields.io/badge/License-Apache%202-brightgreen.svg?style=flat)](https://github.com/Drivemode/TimberLorry/blob/master/LICENSE)
 [![Circle CI](https://circleci.com/gh/Drivemode/TimberLorry/tree/master.svg?style=shield)](https://circleci.com/gh/Drivemode/TimberLorry/tree/master)

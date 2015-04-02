@@ -10,7 +10,6 @@ com_crashlytics_export_strings.xml
 
 # Java class files
 *.class
-*.jar
 
 # Generated files
 bin/

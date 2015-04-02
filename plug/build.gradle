@@ -17,3 +17,9 @@ dependencies {
     compile project(':timberlorry')
     compile 'com.google.code.gson:gson:2.3.1'
 }
+
+apply from: 'https://raw.github.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
+
+afterEvaluate {
+    androidJavadocs.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
+}

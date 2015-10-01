@@ -42,12 +42,18 @@ public class RealmBufferResolver extends AbstractBufferResolver {
     @Override
     public void save(Serializer serializer, Payload payload) {
         Record record = new Record(payload.getClass(), serializer.serialize(payload));
-        Realm realm = Realm.getInstance(realmConfig);
-        realm.beginTransaction();
-        RecordObject obj = realm.createObject(RecordObject.class);
-        obj.setClassName(record.getClazz().getCanonicalName());
-        obj.setBody(record.getBody());
-        realm.commitTransaction();
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(realmConfig);
+            realm.beginTransaction();
+            RecordObject obj = realm.createObject(RecordObject.class);
+            obj.setClassName(record.getClazz().getCanonicalName());
+            obj.setBody(record.getBody());
+            realm.commitTransaction();
+        } finally {
+            if (realm != null)
+                realm.close();
+        }
     }
 
     @Override
@@ -60,30 +66,48 @@ public class RealmBufferResolver extends AbstractBufferResolver {
     @Override
     public List<Record> fetch() {
         List<Record> records = new ArrayList<>();
-        Realm realm = Realm.getInstance(realmConfig);
-        RealmQuery<RecordObject> query = realm.where(RecordObject.class);
-        RealmResults<RecordObject> results = query.findAll();
-        for(RecordObject obj : results) {
-            records.add(new Record(Utils.forName(obj.getClassName()), obj.getBody()));
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(realmConfig);
+            RealmQuery<RecordObject> query = realm.where(RecordObject.class);
+            RealmResults<RecordObject> results = query.findAll();
+            for (RecordObject obj : results) {
+                records.add(new Record(Utils.forName(obj.getClassName()), obj.getBody()));
+            }
+            return records;
+        } finally {
+            if (realm != null)
+                realm.close();
         }
-        return records;
     }
 
     @Override
     public void remove(Record record) {
-        Realm realm = Realm.getInstance(realmConfig);
-        realm.beginTransaction();
-        RealmQuery<RecordObject> query = realm.where(RecordObject.class);
-        query.equalTo("className", record.getClazz().getCanonicalName())
-                .equalTo("body", record.getBody()).findAll().remove(0);
-        realm.commitTransaction();
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(realmConfig);
+            realm.beginTransaction();
+            RealmQuery<RecordObject> query = realm.where(RecordObject.class);
+            query.equalTo("className", record.getClazz().getCanonicalName())
+                    .equalTo("body", record.getBody()).findAll().remove(0);
+            realm.commitTransaction();
+        } finally {
+            if (realm != null)
+                realm.close();
+        }
     }
 
     @Override
     public void clear() {
-        Realm realm = Realm.getInstance(realmConfig);
-        realm.beginTransaction();
-        realm.where(RecordObject.class).findAll().clear();
-        realm.commitTransaction();
+        Realm realm = null;
+        try {
+            realm = Realm.getInstance(realmConfig);
+            realm.beginTransaction();
+            realm.where(RecordObject.class).findAll().clear();
+            realm.commitTransaction();
+        } finally {
+            if (realm != null)
+                realm.close();
+        }
     }
 }

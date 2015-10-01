@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
@@ -25,8 +26,7 @@ import io.realm.RealmResults;
  */
 public class RealmBufferResolver extends AbstractBufferResolver {
     public static final String TAG = RealmBufferResolver.class.getSimpleName();
-    private final Application application;
-    private final String name;
+    private final RealmConfiguration realmConfig;
 
     public RealmBufferResolver(Application application, Account account, String name) {
         this(application, (AccountManager) application.getSystemService(Context.ACCOUNT_SERVICE), application.getContentResolver(), account, name);
@@ -34,14 +34,15 @@ public class RealmBufferResolver extends AbstractBufferResolver {
 
     protected RealmBufferResolver(Application application, @NonNull AccountManager accountManager, @NonNull ContentResolver resolver, Account account, String name) {
         super(accountManager, resolver, account);
-        this.application = application;
-        this.name = name;
+        this.realmConfig = new RealmConfiguration.Builder(application.getApplicationContext())
+                .name(name)
+                .build();
     }
 
     @Override
     public void save(Serializer serializer, Payload payload) {
         Record record = new Record(payload.getClass(), serializer.serialize(payload));
-        Realm realm = Realm.getInstance(application, name);
+        Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         RecordObject obj = realm.createObject(RecordObject.class);
         obj.setClassName(record.getClazz().getCanonicalName());
@@ -59,7 +60,7 @@ public class RealmBufferResolver extends AbstractBufferResolver {
     @Override
     public List<Record> fetch() {
         List<Record> records = new ArrayList<>();
-        Realm realm = Realm.getInstance(application, name);
+        Realm realm = Realm.getInstance(realmConfig);
         RealmQuery<RecordObject> query = realm.where(RecordObject.class);
         RealmResults<RecordObject> results = query.findAll();
         for(RecordObject obj : results) {
@@ -70,7 +71,7 @@ public class RealmBufferResolver extends AbstractBufferResolver {
 
     @Override
     public void remove(Record record) {
-        Realm realm = Realm.getInstance(application, name);
+        Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         RealmQuery<RecordObject> query = realm.where(RecordObject.class);
         query.equalTo("className", record.getClazz().getCanonicalName())
@@ -80,7 +81,7 @@ public class RealmBufferResolver extends AbstractBufferResolver {
 
     @Override
     public void clear() {
-        Realm realm = Realm.getInstance(application, name);
+        Realm realm = Realm.getInstance(realmConfig);
         realm.beginTransaction();
         realm.where(RecordObject.class).findAll().clear();
         realm.commitTransaction();

@@ -15,6 +15,7 @@ import com.drivemode.timberlorry.payload.Record;
 import com.drivemode.timberlorry.payload.Serializer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -49,6 +50,8 @@ public class DefaultBufferResolver extends AbstractBufferResolver {
         try {
             List<Record> payloads = new ArrayList<>();
             c = resolver.query(BufferProvider.CONTENT_URI, null, null, null, null);
+            if (c == null)
+                return Collections.emptyList();
             while (c.moveToNext()) {
                 payloads.add(new Record(c));
             }
